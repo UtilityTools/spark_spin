@@ -5,6 +5,8 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.Encoders;
 import ca.redsofa.domain.Person;
+import ca.redsofa.udf.StringLengthUdf;
+import static org.apache.spark.sql.functions.callUDF;
 
 public class SimpleBatch 
 {
@@ -30,8 +32,16 @@ public class SimpleBatch
 				.getOrCreate();
 
 
-		Dataset<Person> sourceDF = spark.read().json(INPUT_FILE).as(Encoders.bean(Person.class));
-		sourceDF.createOrReplaceTempView("people");
+		Dataset<Person> sourceDS = spark.read().json(INPUT_FILE).as(Encoders.bean(Person.class));
+		sourceDS.createOrReplaceTempView("people");
+		sourceDS.sample(false, .50, 12345).show();
+
+		//Adding a calculated column with UDF 
+		StringLengthUdf.registerStringLengthUdf(spark);		
+		//Creates a new Datasource based on the sourceDS
+		Dataset<Row> newDS = sourceDS.withColumn("name_length", callUDF("stringLengthUdf", sourceDS.col("firstName")));    
+		newDS.sample(false, .50, 12345).show();
+
 
 		Dataset<Row> kids = spark.sql("SELECT * FROM people WHERE age <= 12");
 		kids.sample(false, .50, 12345).show();

@@ -6,7 +6,7 @@ public class Person implements Serializable {
   private String firstName;
   private String lastName;
   private String sex;
-  private int age;
+  private long age;
 
   public String getFirstName() {
     return firstName;
@@ -33,11 +33,11 @@ public class Person implements Serializable {
   }
 
 
-  public int getAge() {
+  public long getAge() {
     return age;
   }
 
-  public void setAge(int age) {
+  public void setAge(long age) {
     this.age = age;
   }
 }
