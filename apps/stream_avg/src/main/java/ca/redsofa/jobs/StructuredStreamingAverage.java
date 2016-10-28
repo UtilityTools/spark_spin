@@ -15,9 +15,11 @@ public final class StructuredStreamingAverage {
     System.out.println("Starting StructuredStreamingAverage job...");
     SparkSession spark = SparkSession
       .builder()
+      .config("spark.eventLog.enabled", "false")
+      .config("spark.driver.memory", "2g")
+      .config("spark.executor.memory", "2g")
       .appName("StructuredStreamingAverage")
       .getOrCreate();
-
 
     StructType personSchema = new StructType()
                                     .add("firstName", "string")
