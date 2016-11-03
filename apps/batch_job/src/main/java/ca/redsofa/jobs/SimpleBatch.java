@@ -8,9 +8,7 @@ import ca.redsofa.domain.Person;
 import ca.redsofa.udf.StringLengthUdf;
 import static org.apache.spark.sql.functions.callUDF;
 
-public class SimpleBatch 
-{
-
+public class SimpleBatch {
 	private static String INPUT_FILE = "people.json";
 
 	public static void main(String[] args) {
@@ -34,21 +32,18 @@ public class SimpleBatch
 
 		Dataset<Person> sourceDS = spark.read().json(INPUT_FILE).as(Encoders.bean(Person.class));
 		sourceDS.createOrReplaceTempView("people");
-		sourceDS.sample(false, .50, 12345).show();
 
-		//Adding a calculated column with UDF 
-		StringLengthUdf.registerStringLengthUdf(spark);		
-		//Creates a new Datasource based on the sourceDS
-		Dataset<Row> newDS = sourceDS.withColumn("name_length", callUDF("stringLengthUdf", sourceDS.col("firstName")));    
-		newDS.sample(false, .50, 12345).show();
-
-
-		Dataset<Row> kids = spark.sql("SELECT * FROM people WHERE age <= 12");
-		kids.sample(false, .50, 12345).show();
+		//Example of adding a calculated column with a user defined function. This section of the code is not
+		//really central to exploring the similarity between a batch and streaming jobs.
+		StringLengthUdf.registerStringLengthUdf(spark);
+		//Creates a new Dataset based on the sourceDS
+		//The new Dataset contains a enw field called name_length which is calculated with the call to our new UDF 
+		Dataset<Row> newDS = sourceDS.withColumn("name_length", callUDF("stringLengthUdf", sourceDS.col("firstName")));    		
+		newDS.show();
 
 
 		Dataset<Row> ageAverage = spark.sql("SELECT AVG(age) as average_age, sex FROM people GROUP BY sex");
-		ageAverage.sample(false, .50, 12345).show();
+		ageAverage.show();
 
 		spark.stop();
 		
