@@ -9,7 +9,7 @@ import ca.redsofa.udf.StringLengthUdf;
 import static org.apache.spark.sql.functions.callUDF;
 
 public class SimpleBatch {
-	private static String INPUT_FILE = "people.json";
+	private static String INPUT_FILE = "/Users/richardr/dev/git/spark_spin/data";
 
 	public static void main(String[] args) {
 		SimpleBatch job = new SimpleBatch();
