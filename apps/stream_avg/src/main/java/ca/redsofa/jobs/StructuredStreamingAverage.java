@@ -9,10 +9,11 @@ import org.apache.spark.sql.types.StructType;
 
 
 public final class StructuredStreamingAverage {
-  private static String INPUT_DIRECTORY = "/home/richardr/streaming_test/input_files";
+  private static String INPUT_DIRECTORY = "/Users/richardr/dev/git/spark_spin/input_files";
 
   public static void main(String[] args) throws Exception {
     System.out.println("Starting StructuredStreamingAverage job...");
+    
     SparkSession spark = SparkSession
       .builder()
       .config("spark.eventLog.enabled", "false")
