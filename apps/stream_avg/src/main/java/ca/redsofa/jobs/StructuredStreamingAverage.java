@@ -14,6 +14,8 @@ public final class StructuredStreamingAverage {
   public static void main(String[] args) throws Exception {
     System.out.println("Starting StructuredStreamingAverage job...");
     
+
+    //1 - Start the Spark session
     SparkSession spark = SparkSession
       .builder()
       .config("spark.eventLog.enabled", "false")
@@ -22,26 +24,31 @@ public final class StructuredStreamingAverage {
       .appName("StructuredStreamingAverage")
       .getOrCreate();
 
+    //2- Define the input data schema
     StructType personSchema = new StructType()
                                     .add("firstName", "string")
                                     .add("lastName", "string")
                                     .add("sex", "string")
                                     .add("age", "long");
 
-    //Create DataFrame representing the stream of input files
+    //3 - Create a Dataset representing the stream of input files
     Dataset<Person> personStream = spark
       .readStream()
       .schema(personSchema)
       .json(INPUT_DIRECTORY)
       .as(Encoders.bean(Person.class));
-       
-      personStream.createOrReplaceTempView("people");
-      Dataset<Row> ageAverage = spark.sql("SELECT AVG(age) as average_age, sex FROM people GROUP BY sex");
 
-      StreamingQuery query = ageAverage.writeStream()
-        .outputMode("complete")
-        .format("console")
-        .start();
+    //4 - Create a temporary table so we can use SQL queries       
+    personStream.createOrReplaceTempView("people");
+
+    String sql = "SELECT AVG(age) as average_age, sex FROM people GROUP BY sex";
+    Dataset<Row> ageAverage = spark.sql(sql);
+
+    //5 - Write the the output of the query to the consold
+    StreamingQuery query = ageAverage.writeStream()
+      .outputMode("complete")
+      .format("console")
+      .start();
 
     query.awaitTermination();
   }
