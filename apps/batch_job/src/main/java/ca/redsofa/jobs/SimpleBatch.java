@@ -59,8 +59,8 @@ public class SimpleBatch {
         //6 - Show a few records in the newDS Dataset. Added a name_length column
         newDS.show();
 
-        Sring sql = "SELECT " + 
-                        "AVG(age) as average_age " + 
+        String sql = "SELECT " + 
+                        "AVG(age) as average_age, " + 
                         "sex " + 
                      "FROM " +
                        "people " +  
